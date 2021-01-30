@@ -35,3 +35,17 @@ class PortForm(forms.ModelForm):
 			'id': forms.TextInput(attrs={'class':'form-control'}),
 			'node': forms.Select(attrs={'class':'form-control'}),
 		}
+
+class PortNodeForm(forms.ModelForm):
+	
+	class Meta:
+		model = Port
+		fields = [
+			'node',
+		]
+		labels = {
+			'node':'Node'
+		}
+		widgets = {
+			'node': forms.Select(attrs={'class':'form-control'}),
+		}

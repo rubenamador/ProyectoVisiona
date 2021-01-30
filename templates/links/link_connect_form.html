@@ -1,0 +1,58 @@
+<!-- Herencia del template base -->	
+{% extends 'base/base.html' %}
+
+<!-- Bloque del contenido -->
+{% block content %}
+<!-- Coger elemento nodo de origen -->
+<div id="source">Source: {{source.name}}</div>
+<!-- Indicar nodo de destino -->
+
+<form id="form">
+	{{ form.as_p }}
+</form>
+
+<button class="btn btn-success" onclick="getValue()">Conectar</button>
+
+<table class="table table-striped table-hover"></>
+	<thead>
+		<tr>
+			<td></td>
+			<td></td>
+		</tr>
+	</thead>
+	<tbody>
+		{% if nodes %}
+		{% for node in nodes %}
+		<tr>
+			
+			<td>{{ node.name }}</td>
+			<td>{{ node.id }}</td>
+		</tr>
+		{% endfor %}
+		{% else %}
+		<h1>No hay registros de nodos</h1>
+		{% endif %}
+	</tbody>
+</table>
+
+<input id="dest2" style="visibility:hidden"></input>
+<script>
+function getValue() {
+	var origin = "{{ source.id }}";
+	console.log();
+	var x = document.getElementById("form");
+	var text = "";
+	
+	text = x.elements[0].value;
+	
+	//<p id="demo"></p>
+	//document.getElementById("demo").innerHTML = text;
+	if(text != "")
+	{
+		window.location.assign('/links/pathLink/' + origin + '/' + text);
+	}
+}
+</script>
+
+
+{% endblock %}

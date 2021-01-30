@@ -3,7 +3,7 @@ from apps.Links.views import main_page, index, link_view
 from apps.Links.views import link_list
 from apps.Links.views import link_edit, link_delete
 from apps.Links.views import LinkList, LinkCreate, LinkUpdate, LinkDelete
-from apps.Links.views import LinkGraph
+from apps.Links.views import LinkGraph, LinkConnect, LinkPath
 
 urlpatterns = [
 	re_path(r'^$', main_page),
@@ -13,4 +13,6 @@ urlpatterns = [
 	re_path(r'^editLink/(?P<pk>[\w|\W]+)/$', LinkUpdate.as_view(), name='editLink'),
 	re_path(r'^deleteLink/(?P<pk>[\w|\W]+)/$', LinkDelete.as_view(), name='deleteLink'),
 	re_path(r'^graphLink$', LinkGraph.as_view(), name='graphLink'),
+	re_path(r'^connectLink/(?P<pk>[\w|\W]+)/$', LinkConnect.as_view(), name='connectLink'),
+	re_path(r'^pathLink/(?P<pk>[\w|\W]+)/(?P<pk2>[\w|\W]+)/$', LinkPath.as_view(), name='pathLink'),
 ]
