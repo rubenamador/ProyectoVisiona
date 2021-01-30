@@ -1,5 +1,6 @@
 <!-- Herencia del template base -->	
 {% extends 'base/base.html' %}
+{% load links_filter %}
 
 <!-- Bloque de cabecera -->
 {% block header %}
@@ -17,7 +18,8 @@
 	</thead>
 	<tbody>
 		{% if links %}
-		{% for link in links %}
+		{% for link in links|links_filter %}
+		{% if link.id != " " %}
 		<tr>
 			
 			<td>{{ link.id }}</td>
