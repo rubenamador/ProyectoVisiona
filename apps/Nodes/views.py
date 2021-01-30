@@ -65,3 +65,17 @@ def port_edit(request, id_port):
 			form.save()
 		return redirect('Nodes:listPort')
 	return render(request, 'nodes/form.html', {'form':form})
+
+def node_delete(request, id_node):
+	node = Node.objects.get(id=id_node)
+	if request.method == 'POST':
+		node.delete()
+		return redirect('Nodes:listNode')
+	return render(request, 'nodes/node_delete.html', {'node':node})
+	
+def port_delete(request, id_port):
+	port = Port.objects.get(id=id_port)
+	if request.method == 'POST':
+		port.delete()
+		return redirect('Nodes:listPort')
+	return render(request, 'nodes/port_delete.html', {'port':port})

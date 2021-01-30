@@ -1,7 +1,7 @@
 from django.urls import re_path
 from apps.Nodes.views import main_page, index, node_view, port_view
 from apps.Nodes.views import node_list, port_list
-from apps.Nodes.views import node_edit, port_edit
+from apps.Nodes.views import node_edit, port_edit, node_delete, port_delete
 
 urlpatterns = [
 	re_path(r'^$', main_page),
@@ -12,4 +12,6 @@ urlpatterns = [
 	re_path(r'^listPort$', port_list, name='listPort'),
 	re_path(r'^editNode/(?P<pk>[\w|\W]+)/$', node_edit, name='editNode'),
 	re_path(r'^editPort/(?P<pk>[\w|\W]+)/$', port_edit, name='editPort'),
+	re_path(r'^deleteNode/(?P<pk>[\w|\W]+)/$', node_delete, name='deleteNode'),
+	re_path(r'^deletePort/(?P<pk>[\w|\W]+)/$', port_delete, name='deletePort'),
 ]

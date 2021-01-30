@@ -25,6 +25,9 @@
 				<a class="btn btn-primary btn-sm" 
 				href="{% url 'Nodes:editPort' port.id %}"
 				>Editar</a>
+				<a class="btn btn-danger btn-sm" 
+				href="{% url 'Nodes:deletePort' port.id %}"
+				>Eliminar</a>
 			</td>
 		</tr>
 		{% endfor %}

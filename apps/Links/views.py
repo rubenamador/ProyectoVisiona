@@ -39,3 +39,10 @@ def link_edit(request, id_link):
 			form.save()
 		return redirect('Links:listLink')
 	return render(request, 'links/form.html', {'form':form})
+
+def link_delete(request, id_link):
+	link = Link.objects.get(id=id_link)
+	if request.method == 'POST':
+		link.delete()
+		return redirect('Links:listLink')
+	return render(request, 'links/link_delete.html', {'link':link})

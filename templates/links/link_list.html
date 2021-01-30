@@ -30,6 +30,9 @@
 				<a class="btn btn-primary btn-sm" 
 				href="{% url 'Links:editLink' link.id %}"
 				>Editar</a>
+				<a class="btn btn-danger btn-sm" 
+				href="{% url 'Links:deleteLink' link.id %}"
+				>Eliminar</a>
 			</td>			
 		</tr>
 		{% endif %}
