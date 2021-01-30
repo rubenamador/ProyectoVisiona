@@ -69,3 +69,7 @@ class LinkDelete(DeleteView):
 	model = Link
 	template_name = 'links/link_delete.html'
 	success_url = reverse_lazy('Links:listLink')
+
+class LinkGraph(ListView):
+	model = Link
+	template_name = 'links/link_graph.html'
