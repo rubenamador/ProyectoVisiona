@@ -68,7 +68,7 @@ class LinkCreate(CreateView):
 	model = Link
 	form_class = LinkForm
 	template_name = 'links/form.html'
-	success_url = reverse_lazy('Links:listLink')
+	success_url = reverse_lazy('Links:updateAllLinks')
 
 class LinkUpdate(UpdateView):
 	model = Link
@@ -142,6 +142,26 @@ def all_links_delete(request):
 		Link.objects.all().delete()
 		return redirect('Links:listLink')
 	return render(request, 'links/all_links_delete.html')
+
+def all_links_update(request):
+	if request.method == 'POST':
+		links = Link.objects.all()
+		#Rellenamos los campos de cada link: nodo origen y nodo destino
+		for link in links:
+			link.source_node = link.source.node
+			link.dest_node = link.dest.node
+			link.save()
+		#Comprobamos que todos los links tienen su duplicado con origen y destino al reves
+		for link1 in links:
+			exist = False
+			for link2 in links:
+				if str(link1.dest) == str(link2.id):
+					exist = True
+			#Si el link no tiene su duplicado, lo creamos
+			if exist == False:
+				Link.objects.create_link(link1.dest, link1.dest, link1.source, link1.dest_node, link1.source_node)
+		return redirect('Links:listLink')
+	return render(request, 'links/all_links_update.html')
 
 #### NO SON VISTAS
 
