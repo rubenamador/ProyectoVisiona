@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from apps.Links.forms import LinkForm
 from apps.Links.models import Link
@@ -63,4 +63,9 @@ class LinkUpdate(UpdateView):
 	model = Link
 	form_class = LinkForm
 	template_name = 'links/form.html'
+	success_url = reverse_lazy('Links:listLink')
+
+class LinkDelete(DeleteView):
+	model = Link
+	template_name = 'links/link_delete.html'
 	success_url = reverse_lazy('Links:listLink')
