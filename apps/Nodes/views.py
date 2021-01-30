@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.views.generic import ListView
 
 from apps.Nodes.forms import NodeForm, PortForm
 from apps.Nodes.models import Node, Port
@@ -79,3 +80,11 @@ def port_delete(request, id_port):
 		port.delete()
 		return redirect('Nodes:listPort')
 	return render(request, 'nodes/port_delete.html', {'port':port})
+
+class NodeList(ListView):
+	model = Node
+	template_name = 'nodes/node_list.html'
+
+class PortList(ListView):
+	model = Port
+	template_name = 'nodes/port_list.html'

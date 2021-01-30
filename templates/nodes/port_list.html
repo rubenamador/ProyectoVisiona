@@ -16,8 +16,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% if ports %}
-		{% for port in ports %}
+		{% if object_list %}
+		{% for port in object_list %}
 		<tr>
 			<td>{{ port.id }}</td>
 			<td>{{ port.node }}</td>

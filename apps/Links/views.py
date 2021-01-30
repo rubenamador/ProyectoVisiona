@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.views.generic import ListView
 
 from apps.Links.forms import LinkForm
 from apps.Links.models import Link
@@ -46,3 +47,7 @@ def link_delete(request, id_link):
 		link.delete()
 		return redirect('Links:listLink')
 	return render(request, 'links/link_delete.html', {'link':link})
+
+class LinkList(ListView):
+	model = Link
+	template_name = 'links/link_list.html'

@@ -18,8 +18,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% if links %}
-		{% for link in links|links_filter %}
+		{% if object_list %}
+		{% for link in object_list|links_filter %}
 		{% if link.id != " " %}
 		<tr>
 			
