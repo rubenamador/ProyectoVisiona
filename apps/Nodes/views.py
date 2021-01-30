@@ -152,6 +152,26 @@ class PortAPI(APIView):
 		
 		return HttpResponse(json.dumps(response.data), content_type='application/json')
 
+class NodeInfo(ListView):
+	model = Node
+	template_name = 'nodes/node_info.html'
+	
+	def get_context_data(self, **kwargs):
+		context = super(NodeInfo, self).get_context_data(**kwargs)
+		pk = self.kwargs.get('pk', 0)
+		node = self.model.objects.get(id=pk)
+		context['node'] = node
+		#ports = Port.objects.all()
+		ports_of_node = query_get_ports_by_node(str(node))
+		ports = []
+		for i in range(len(ports_of_node)):
+			ports.append(ports_of_node[i]["_id"])
+		context['ports'] = ports
+		#links = Links.objects.all()
+		#links_of_node = query_get_ports_by_node(str(node))
+		#context['links'] = links_of_node
+		return context
+
 def all_nodes_delete(request):
 	if request.method == 'POST':
 		Node.objects.all().delete()
@@ -177,6 +197,15 @@ def get_topology(request):
 	return render(request, 'nodes/get_topology.html')
 
 ########### NO SON VISTAS
+
+def query_get_ports_by_node(node):
+	client = MongoClient('localhost', 27017)
+	db = client.djongo
+	Nodes_port = db.Nodes_port
+	
+	pipeline = [{"$match":{"node_id":node}},  
+				{"$group": {"_id": "$id"}}]
+	return list(db.Nodes_port.aggregate(pipeline))
 
 def mongoimport_all():
 	mongoimport_all_nodes()

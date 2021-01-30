@@ -35,6 +35,9 @@ div.btn-group btn-group-justified {
 			<td>{{ node.id }}</td>
 			<td>{{ node.name }}</td>
 			<td>
+				<a class="btn btn-info btn-sm" 
+				href="{% url 'Nodes:infoNode' node.id %}"
+				>Info</a>
 				<a class="btn btn-primary btn-sm" 
 				href="{% url 'Nodes:editNode' node.id %}"
 				>Editar</a>
