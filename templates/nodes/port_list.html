@@ -1,0 +1,30 @@
+<!-- Herencia del template base -->	
+{% extends 'base/base.html' %}
+
+<!-- Bloque de cabecera -->
+{% block header %}
+{% endblock %}
+
+<!-- Bloque del contenido -->
+{% block content %}
+<table class="table table-striped table-hover">
+	<thead>
+		<tr class="danger">
+			<td>ID</td>
+			<td>Node</td>
+		</tr>
+	</thead>
+	<tbody>
+		{% if ports %}
+		{% for port in ports %}
+		<tr>
+			<td>{{ port.id }}</td>
+			<td>{{ port.node }}</td>
+		</tr>
+		{% endfor %}
+		{% else %}
+		<h1>No hay registros de puertos</h1>
+		{% endif %}
+	</tbody>
+</table>
+{% endblock %}
