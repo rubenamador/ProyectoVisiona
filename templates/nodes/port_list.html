@@ -12,6 +12,7 @@
 		<tr class="danger">
 			<td>ID</td>
 			<td>Node</td>
+			<td>Acciones</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,6 +21,11 @@
 		<tr>
 			<td>{{ port.id }}</td>
 			<td>{{ port.node }}</td>
+			<td>
+				<a class="btn btn-primary btn-sm" 
+				href="{% url 'Nodes:editPort' port.id %}"
+				>Editar</a>
+			</td>
 		</tr>
 		{% endfor %}
 		{% else %}

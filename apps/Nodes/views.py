@@ -43,3 +43,25 @@ def port_list(request):
 	port = Port.objects.all().order_by('id')
 	contexto = {'ports':port}
 	return render(request, 'nodes/port_list.html', contexto)
+
+def node_edit(request, id_node):
+	node = Node.objects.get(id=id_node)
+	if request.method == 'GET':
+		form = NodeForm(instance=node)
+	else:
+		form = NodeForm(request.POST, instance=node)
+		if form.is_valid():
+			form.save()
+		return redirect('Nodes:listNode')
+	return render(request, 'nodes/form.html', {'form':form})
+	
+def port_edit(request, id_port):
+	port = Port.objects.get(id=id_port)
+	if request.method == 'GET':
+		form = PortForm(instance=port)
+	else:
+		form = PortForm(request.POST, instance=port)
+		if form.is_valid():
+			form.save()
+		return redirect('Nodes:listPort')
+	return render(request, 'nodes/form.html', {'form':form})

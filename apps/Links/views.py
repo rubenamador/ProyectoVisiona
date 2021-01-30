@@ -28,3 +28,14 @@ def link_list(request):
 	link = Link.objects.all().order_by('id')
 	contexto = {'links':link}
 	return render(request, 'links/link_list.html', contexto)
+
+def link_edit(request, id_link):
+	link = Link.objects.get(id=id_link)
+	if request.method == 'GET':
+		form = LinkForm(instance=link)
+	else:
+		form = LinkForm(request.POST, instance=link)
+		if form.is_valid():
+			form.save()
+		return redirect('Links:listLink')
+	return render(request, 'links/form.html', {'form':form})

@@ -14,6 +14,7 @@
 			<td>ID</td>
 			<td>Puerto de partida</td>
 			<td>Puerto de destino</td>
+			<td>Acciones</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -25,6 +26,11 @@
 			<td>{{ link.id }}</td>
 			<td>{{ link.source }}</td>
 			<td>{{ link.dest }}</td>
+			<td>
+				<a class="btn btn-primary btn-sm" 
+				href="{% url 'Links:editLink' link.id %}"
+				>Editar</a>
+			</td>			
 		</tr>
 		{% endif %}
 		{% endfor %}

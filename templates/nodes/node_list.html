@@ -12,6 +12,7 @@
 		<tr class="danger">
 			<td>ID</td>
 			<td>Nombre</td>
+			<td>Acciones</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,6 +21,11 @@
 		<tr>
 			<td>{{ node.id }}</td>
 			<td>{{ node.name }}</td>
+			<td>
+				<a class="btn btn-primary btn-sm" 
+				href="{% url 'Nodes:editNode' node.id %}"
+				>Editar</a>
+			</td>
 		</tr>
 		{% endfor %}
 		{% else %}
