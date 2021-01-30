@@ -7,7 +7,7 @@ from apps.Nodes.views import NodeUpdate, PortUpdate, NodeDelete, PortDelete
 from apps.Nodes.views import NodeAPI, PortAPI
 from apps.Nodes.views import all_nodes_delete, all_ports_delete
 from apps.Nodes.views import import_all, get_topology
-from apps.Nodes.views import NodeInfo
+from apps.Nodes.views import NodeInfo, PortInfo
 
 urlpatterns = [
 	re_path(r'^$', main_page),
@@ -27,4 +27,5 @@ urlpatterns = [
 	re_path(r'^importAll$', import_all, name='importAll'),
 	re_path(r'^getTopology', get_topology, name='getTopology'),
 	re_path(r'^infoNode/(?P<pk>[\w|\W]+)/$', NodeInfo.as_view(), name='infoNode'),
+	re_path(r'^infoPort/(?P<pk>[\w|\W]+)/$', PortInfo.as_view(), name='infoPort'),
 ]

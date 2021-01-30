@@ -172,6 +172,30 @@ class NodeInfo(ListView):
 		#context['links'] = links_of_node
 		return context
 
+class PortInfo(ListView):
+	model = Port
+	template_name = 'nodes/port_info.html'
+	
+	def get_context_data(self, **kwargs):
+		context = super(PortInfo, self).get_context_data(**kwargs)
+		pk = self.kwargs.get('pk', 0)
+		port = self.model.objects.get(id=pk)
+		context['port'] = port
+		context['type'] = "port"
+		if str(port)[0:8] == "openflow":
+			datos = get_port_info_from_url(port)
+			context['linkdown'] = datos["link-down"]
+			context['blocked'] = datos["blocked"]
+			context['tbytes'] = datos["tbytes"]
+			context['rbytes'] = datos["rbytes"]
+			context['drops'] = datos["drops"]
+		if str(port)[0:4] == "host":
+			context['type'] = "host"
+			datos = get_host_info_from_url(port)
+			context['mac'] = datos["mac"]
+			context['ip'] = datos["ip"]
+		return context
+
 def all_nodes_delete(request):
 	if request.method == 'POST':
 		Node.objects.all().delete()
@@ -413,3 +437,175 @@ def get_json_from_url():
 	query_get_all_nodes_info()
 	query_get_all_ports_info()
 	query_get_all_links_info()
+
+def get_port_info_from_url(port):
+	url = 'http://192.168.38.128:8181/restconf/operational/opendaylight-inventory:nodes/node/' + str(port.node) + '/node-connector/' + str(port) + '/'
+	username = 'admin'
+	password = 'admin'
+	p = HTTPPasswordMgrWithDefaultRealm()
+	
+	p.add_password(None, url, username, password)
+	
+	handler = HTTPBasicAuthHandler(p)
+	opener = build_opener(handler)
+	install_opener(opener)
+	
+	content = urlopen(url).read()
+	#print(content)
+	
+	data = content.decode("utf-8")
+	print(data)
+	
+	filename = 'port_info.json'
+	with open(filename, 'w') as outfile:
+		json.dump(data, outfile)
+	
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("\\", "").replace("\"{", "{").replace("}\"", "}"), end='')
+	
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	db.port_info.remove({})
+	mongoimport('localhost', 27017, 'nets', 'port_info', 'port_info.json')
+	
+	datos = {}
+	
+	link_down = query_get_link_down_port_info()
+	datos["link-down"] = link_down
+	blocked = query_get_blocked_port_info()
+	datos["blocked"] = blocked
+	tbytes = query_get_bytes_transmitted_port_info()
+	datos["tbytes"] = tbytes
+	rbytes = query_get_bytes_received_port_info()
+	datos["rbytes"] = rbytes
+	drops = query_get_receive_drops_port_info()
+	datos["drops"] = drops
+	
+	print(datos)
+	return datos
+	
+def query_get_link_down_port_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	port_info = db.port_info
+	
+	pipeline = [{"$group": {"_id": "$node-connector.flow-node-inventory:state.link-down"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.port_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0]
+
+def query_get_blocked_port_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	port_info = db.port_info
+	
+	pipeline = [{"$group": {"_id": "$node-connector.flow-node-inventory:state.blocked"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.port_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0]
+	
+def query_get_bytes_transmitted_port_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	port_info = db.port_info
+	
+	pipeline = [{"$group": {"_id": "$node-connector.opendaylight-port-statistics:flow-capable-node-connector-statistics.bytes.transmitted"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.port_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0]
+	
+def query_get_bytes_received_port_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	port_info = db.port_info
+	
+	pipeline = [{"$group": {"_id": "$node-connector.opendaylight-port-statistics:flow-capable-node-connector-statistics.bytes.received"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.port_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0]
+
+def query_get_receive_drops_port_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	port_info = db.port_info
+	
+	pipeline = [{"$group": {"_id": "$node-connector.opendaylight-port-statistics:flow-capable-node-connector-statistics.receive-drops"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.port_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0]
+	
+def get_host_info_from_url(host):
+	url = 'http://192.168.38.128:8181/restconf/operational/network-topology:network-topology/topology/flow:1/node/' + str(host) + '/'
+	username = 'admin'
+	password = 'admin'
+	p = HTTPPasswordMgrWithDefaultRealm()
+	
+	p.add_password(None, url, username, password)
+	
+	handler = HTTPBasicAuthHandler(p)
+	opener = build_opener(handler)
+	install_opener(opener)
+	
+	content = urlopen(url).read()
+	#print(content)
+	
+	data = content.decode("utf-8")
+	print(data)
+	
+	filename = 'host_info.json'
+	with open(filename, 'w') as outfile:
+		json.dump(data, outfile)
+	
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("\\", "").replace("\"{", "{").replace("}\"", "}"), end='')
+	
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	db.port_info.remove({})
+	mongoimport('localhost', 27017, 'nets', 'host_info', 'host_info.json')
+	
+	datos = {}
+	
+	mac = query_get_mac_host_info()
+	datos["mac"] = mac
+	ip = query_get_ip_host_info()
+	datos["ip"] = ip
+	
+	print(datos)
+	return datos
+	
+def query_get_mac_host_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	host_info = db.host_info
+	
+	pipeline = [{"$group": {"_id": "$node.host-tracker-service:addresses.mac"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.host_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0][0]
+	
+def query_get_ip_host_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	host_info = db.host_info
+	
+	pipeline = [{"$group": {"_id": "$node.host-tracker-service:addresses.ip"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.host_info.aggregate(pipeline))
+	
+	return content[0]["_id"][0][0]
