@@ -4,6 +4,7 @@ from apps.Nodes.views import node_list, port_list
 from apps.Nodes.views import node_edit, port_edit, node_delete, port_delete
 from apps.Nodes.views import NodeList, PortList, NodeCreate, PortCreate
 from apps.Nodes.views import NodeUpdate, PortUpdate, NodeDelete, PortDelete
+from apps.Nodes.views import NodeAPI, PortAPI
 
 urlpatterns = [
 	re_path(r'^$', main_page),
@@ -16,4 +17,6 @@ urlpatterns = [
 	re_path(r'^editPort/(?P<pk>[\w|\W]+)/$', PortUpdate.as_view(), name='editPort'),
 	re_path(r'^deleteNode/(?P<pk>[\w|\W]+)/$', NodeDelete.as_view(), name='deleteNode'),
 	re_path(r'^deletePort/(?P<pk>[\w|\W]+)/$', PortDelete.as_view(), name='deletePort'),
+	re_path(r'^apiNode$', NodeAPI.as_view(), name='apiNode'),
+	re_path(r'^apiPort$', PortAPI.as_view(), name='apiPort'),
 ]

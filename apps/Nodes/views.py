@@ -2,9 +2,12 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from rest_framework.views import APIView
+import json
 
 from apps.Nodes.forms import NodeForm, PortForm
 from apps.Nodes.models import Node, Port
+from apps.Nodes.serializers import NodeSerializer, PortSerializer
 
 # Create your views here.
 
@@ -123,3 +126,22 @@ class PortDelete(DeleteView):
 	model = Port
 	template_name = 'nodes/port_delete.html'
 	success_url = reverse_lazy('Nodes:listPort')
+
+class NodeAPI(APIView):
+	serializer = NodeSerializer
+	
+	def get(self, request, format=None):
+		lista = Node.objects.all()
+		response = self.serializer(lista, many=True)
+		
+		return HttpResponse(json.dumps(response.data), content_type='application/json')
+		
+class PortAPI(APIView):
+	serializer = PortSerializer
+	
+	def get(self, request, format=None):
+		lista = Port.objects.all()
+		response = self.serializer(lista, many=True)
+		
+		return HttpResponse(json.dumps(response.data), content_type='application/json')
+		

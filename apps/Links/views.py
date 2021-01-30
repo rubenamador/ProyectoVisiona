@@ -2,9 +2,12 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
+from rest_framework.views import APIView
+import json
 
 from apps.Links.forms import LinkForm
 from apps.Links.models import Link
+from apps.Links.serializers import LinkSerializer
 
 from apps.Nodes.models import Node, Port
 from apps.Nodes.forms import PortNodeForm, PortForm
@@ -81,6 +84,15 @@ class LinkDelete(DeleteView):
 class LinkGraph(ListView):
 	model = Link
 	template_name = 'links/link_graph.html'
+
+class LinkAPI(APIView):
+	serializer = LinkSerializer
+	
+	def get(self, request, format=None):
+		lista = Link.objects.all()
+		response = self.serializer(lista, many=True)
+		
+		return HttpResponse(json.dumps(response.data), content_type='application/json')
 
 class LinkConnect(FormView):
 	model = Node
