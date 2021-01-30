@@ -9,6 +9,13 @@ from apps.Nodes.forms import NodeForm, PortForm
 from apps.Nodes.models import Node, Port
 from apps.Nodes.serializers import NodeSerializer, PortSerializer
 
+import pymongo
+from pymongo import MongoClient
+from json import loads
+import fileinput
+
+from urllib.request import urlopen, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, build_opener, install_opener
+
 # Create your views here.
 
 def main_page(request):
@@ -156,3 +163,184 @@ def all_ports_delete(request):
 		Port.objects.all().delete()
 		return redirect('Nodes:listPort')
 	return render(request, 'nodes/all_ports_delete.html')
+
+def get_topology(request):
+	if request.method == 'POST':
+		get_json_from_url()
+		return redirect('Nodes:listNode')
+	return render(request, 'nodes/get_topology.html')
+
+########### NO SON VISTAS
+
+def query_get_all_nodes_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	nodes = db.nodes
+	
+	pipeline = [{"$unwind":"$network-topology.topology"},
+				{"$unwind":"$network-topology.topology.node"},
+				{"$group": {"_id": "$network-topology.topology.node.node-id"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.nodes.aggregate(pipeline))
+	#data = content.decode("utf-8")
+	
+	filename = 'node.json'
+	with open(filename, 'w') as outfile:
+		json.dump(content, outfile)
+	
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("_id", "id").replace("},", "},\n"), end='')
+	
+	i = 0
+	number = '00'
+	name = ""
+	catch = False
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			if(line[9:17] == "openflow"):
+				if(line[19] is '\"'):
+					number = line[18]
+				else:
+					number = line[18:20]
+				name = "openflow:" + number
+			
+			if(line[9:13] == "host"):
+				name = line[9:31]
+			
+			print(line.replace("}", ", \"name\":\"" + name + "\"}"), end='')
+			i = i + 1
+
+def query_get_all_ports_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	nodes = db.nodes
+	
+	pipeline = [{"$unwind":"$network-topology.topology"},
+				{"$unwind":"$network-topology.topology.node"},
+				{"$unwind":"$network-topology.topology.node.termination-point"},
+				{"$group": {"_id": "$network-topology.topology.node.termination-point.tp-id"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.nodes.aggregate(pipeline))
+	#data = content.decode("utf-8")
+	
+	filename = 'port.json'
+	with open(filename, 'w') as outfile:
+		json.dump(content, outfile)
+
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("_id", "id").replace("},", "},\n"), end='')
+
+	number = '00'
+	name = ""
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			if(line[9:17] == "openflow"):
+				if(line[19] is ':'):
+					number = line[18]
+				else:
+					number = line[18:20]
+				name = "openflow:" + number
+			
+			if(line[9:13] == "host"):
+				name = line[9:31]
+			print(line.replace("}", ", \"node_id\":\"" + name + "\"}"), end='')
+
+def query_get_all_links_info():
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	nodes = db.nodes
+	
+	pipeline = [{"$unwind":"$network-topology.topology"},
+				{"$unwind":"$network-topology.topology.link"},
+				{"$group": {"_id": "$network-topology.topology.link"}}]
+	#pprint.pprint(list(db.nodes.aggregate(pipeline)))
+	
+	content = list(db.nodes.aggregate(pipeline))
+	#data = content.decode("utf-8")
+	
+	filename = 'link.json'
+	with open(filename, 'w') as outfile:
+		json.dump(content, outfile)
+	
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("_id\": {\"link-id", "id").replace("\"source\": {", "").replace("\"destination\": {", "")
+			.replace("source-tp", "source_id").replace("dest-tp", "dest_id")
+			.replace("source-node", "source_node_id").replace("dest-node", "dest_node_id")
+			.replace("},", ",").replace("}},", "},").replace("}}}]", "}]"), end='')
+			
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("},", "},\n"), end='')
+	
+	base = ""
+	sustituto = ""
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			encontradoBase = False
+			encontradoSustituto = False
+			for i in range(len(line)):
+				if(line[i] == '/' and encontradoSustituto == False):
+					sustituto = line[0:i]
+					encontradoSustituto = True
+				if(line[i:i+12] == "dest_node_id" and encontradoBase == False):
+					total = i-4
+					base = line[0:total]
+					encontradoBase = True
+			
+			if(encontradoSustituto == True and encontradoBase == True):
+				print(line.replace(base, sustituto), end='')
+			else:
+				print(line, end='')
+
+			
+
+def mongoimport(host, port, db, collection, file):
+	client = MongoClient(host, port)
+	db = client[db]
+	collection_currency = db[collection]
+	
+	with open(file) as f:
+		file_data = json.load(f)
+	
+	collection_currency.insert(file_data)
+	client.close()
+	
+def get_json_from_url():
+	url = 'http://192.168.38.128:8181/restconf/operational/network-topology:network-topology/'
+	username = 'admin'
+	password = 'admin'
+	p = HTTPPasswordMgrWithDefaultRealm()
+	
+	p.add_password(None, url, username, password)
+	
+	handler = HTTPBasicAuthHandler(p)
+	opener = build_opener(handler)
+	install_opener(opener)
+	
+	content = urlopen(url).read()
+	#print(content)
+	
+	data = content.decode("utf-8")
+	print(data)
+	
+	filename = 'data.json'
+	with open(filename, 'w') as outfile:
+		json.dump(data, outfile)
+	
+	with fileinput.FileInput(filename, inplace=True) as file:
+		for line in file:
+			print(line.replace("\\", "").replace("\"{", "{").replace("}\"", "}"), end='')
+	
+	client = MongoClient('localhost', 27017)
+	db = client.nets
+	db.nodes.remove({})
+	mongoimport('localhost', 27017, 'nets', 'nodes', 'data.json')
+	
+	query_get_all_nodes_info()
+	query_get_all_ports_info()
+	query_get_all_links_info()

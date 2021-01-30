@@ -6,6 +6,7 @@ from apps.Nodes.views import NodeList, PortList, NodeCreate, PortCreate
 from apps.Nodes.views import NodeUpdate, PortUpdate, NodeDelete, PortDelete
 from apps.Nodes.views import NodeAPI, PortAPI
 from apps.Nodes.views import all_nodes_delete, all_ports_delete
+from apps.Nodes.views import get_topology
 
 urlpatterns = [
 	re_path(r'^$', main_page),
@@ -21,5 +22,6 @@ urlpatterns = [
 	re_path(r'^apiNode$', NodeAPI.as_view(), name='apiNode'),
 	re_path(r'^apiPort$', PortAPI.as_view(), name='apiPort'),
 	re_path(r'^deleteAllNodes$', all_nodes_delete, name='deleteAllNodes'),
-	re_path(r'^deleteAllPorts$', all_ports_delete, name='deleteAllPorts')
+	re_path(r'^deleteAllPorts$', all_ports_delete, name='deleteAllPorts'),
+	re_path(r'^getTopology', get_topology, name='getTopology'),
 ]

@@ -10,8 +10,9 @@ div.btn-group btn-group-justified {
 }
 </style>
 
-<div class="btn-group btn-group-justified" style="width:30%">
+<div class="btn-group btn-group-justified" style="width:100%">
 	<a href="{% url 'Nodes:deleteAllNodes' %}" class="btn btn-default">Borrar nodos</a>
+	<a href="{% url 'Nodes:getTopology' %}" class="btn btn-default">Obtener json de URL</a>
 </div>
 <div style="visibility: hidden">salto de linea</div>
 {% endblock %}
