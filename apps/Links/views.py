@@ -137,6 +137,12 @@ class LinkPath(ListView):
 		send_packet(path, links, "info")
 		return context
 
+def all_links_delete(request):
+	if request.method == 'POST':
+		Link.objects.all().delete()
+		return redirect('Links:listLink')
+	return render(request, 'links/all_links_delete.html')
+
 #### NO SON VISTAS
 
 

@@ -135,7 +135,7 @@ class NodeAPI(APIView):
 		response = self.serializer(lista, many=True)
 		
 		return HttpResponse(json.dumps(response.data), content_type='application/json')
-		
+
 class PortAPI(APIView):
 	serializer = PortSerializer
 	
@@ -144,4 +144,15 @@ class PortAPI(APIView):
 		response = self.serializer(lista, many=True)
 		
 		return HttpResponse(json.dumps(response.data), content_type='application/json')
-		
+
+def all_nodes_delete(request):
+	if request.method == 'POST':
+		Node.objects.all().delete()
+		return redirect('Nodes:listNode')
+	return render(request, 'nodes/all_nodes_delete.html')
+
+def all_ports_delete(request):
+	if request.method == 'POST':
+		Port.objects.all().delete()
+		return redirect('Nodes:listPort')
+	return render(request, 'nodes/all_ports_delete.html')

@@ -1,0 +1,13 @@
+<!-- Herencia del template base -->	
+{% extends 'base/base.html' %}
+
+<!-- Bloque del contenido -->	
+{% block content %}
+<form method="post">
+	{% csrf_token %}
+	<h3>¿Desea eliminar todos los registros de nodos?</h3>
+	<h4>Si elimina los nodos, tambien se eliminaran los puertos y los links</h3>
+	<button class="btn btn-danger" type="submit">Eliminar</button>
+	<a class="btn btn-default" href="{% url 'Nodes:listNode' %}">Cancelar</a>
+</form>
+{% endblock %}
