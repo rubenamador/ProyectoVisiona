@@ -164,6 +164,12 @@ def all_ports_delete(request):
 		return redirect('Nodes:listPort')
 	return render(request, 'nodes/all_ports_delete.html')
 
+def import_all(request):
+	if request.method == 'POST':
+		mongoimport_all()
+		return redirect('Nodes:listNode')
+	return render(request, 'nodes/import_all.html')
+
 def get_topology(request):
 	if request.method == 'POST':
 		get_json_from_url()
@@ -171,6 +177,40 @@ def get_topology(request):
 	return render(request, 'nodes/get_topology.html')
 
 ########### NO SON VISTAS
+
+def mongoimport_all():
+	mongoimport_all_nodes()
+	mongoimport_all_ports()
+	mongoimport_all_links()
+
+def mongoimport_all_nodes():
+	#query_get_all_nodes_info()
+	mongoimport('localhost', 27017, 'djongo', 'Nodes_node', 'node.json')
+
+def mongoimport_all_ports():
+	#query_get_all_ports_info()
+	mongoimport('localhost', 27017, 'djongo', 'Nodes_port', 'port.json')
+
+def mongoimport_all_links():
+	#query_get_all_links_info()
+	mongoimport('localhost', 27017, 'djongo', 'Links_link', 'link.json')
+	
+#def query_get_and_import_all():
+#	query_get_and_import_all_nodes()
+#	query_get_and_import_all_ports()
+#	query_get_and_import_all_links()
+
+#def query_get_and_import_all_nodes():
+#	query_get_all_nodes_info()
+#	mongoimport('localhost', 27017, 'djongo', 'Nodes_node', 'node.json')
+
+#def query_get_and_import_all_ports():
+#	query_get_all_ports_info()
+#	mongoimport('localhost', 27017, 'djongo', 'Nodes_port', 'port.json')
+
+#def query_get_and_import_all_links():
+#	query_get_all_links_info()
+#	mongoimport('localhost', 27017, 'djongo', 'Links_link', 'link.json')
 
 def query_get_all_nodes_info():
 	client = MongoClient('localhost', 27017)
