@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView
 
 from apps.Nodes.forms import NodeForm, PortForm
 from apps.Nodes.models import Node, Port
@@ -97,6 +97,18 @@ class NodeCreate(CreateView):
 	success_url = reverse_lazy('Nodes:listNode')
 
 class PortCreate(CreateView):
+	model = Port
+	form_class = PortForm
+	template_name = 'nodes/form.html'
+	success_url = reverse_lazy('Nodes:listPort')
+
+class NodeUpdate(UpdateView):
+	model = Node
+	form_class = NodeForm
+	template_name = 'nodes/form.html'
+	success_url = reverse_lazy('Nodes:listNode')
+	
+class PortUpdate(UpdateView):
 	model = Port
 	form_class = PortForm
 	template_name = 'nodes/form.html'
